@@ -24,15 +24,15 @@ def main():
     response = client.models.generate_content(model=model,contents=messages)
 
     if response.usage_metadata == None:
-            raise RuntimeError('no usage metadata returned from api')
+        raise RuntimeError('no usage metadata returned from api')
     if response.text == None:
-            raise RuntimeError('no text returned from api')
+        raise RuntimeError('no text returned from api')
     
     if args.verbose == True:
         print(f'User prompt: {args.user_prompt}')
         print(f'Prompt tokens: {response.usage_metadata.prompt_token_count}')
         print(f'Response tokens: {response.usage_metadata.candidates_token_count}')
-        
+
     print(f'Response: {response.text}')
 
 if __name__ == "__main__":
