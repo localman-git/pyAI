@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompts import system_prompt
+from functions.call_function import available_functions
 
 def main():
     
@@ -26,20 +27,25 @@ def main():
         model=model,
         contents=messages,
         config=types.GenerateContentConfig(
-            system_instruction=system_prompt),
+            system_instruction=system_prompt,
+            tools=[available_functions]),
         )
 
     if response.usage_metadata == None:
         raise RuntimeError('no usage metadata returned from api')
-    if response.text == None:
-        raise RuntimeError('no text returned from api')
+    if response.text == None and response.function_calls == None:
+        raise RuntimeError('no text or function calls returned from api')
     
     if args.verbose == True:
         print(f'User prompt: {args.user_prompt}')
         print(f'Prompt tokens: {response.usage_metadata.prompt_token_count}')
         print(f'Response tokens: {response.usage_metadata.candidates_token_count}')
 
-    print(f'Response: {response.text}')
+    if response.function_calls != None:
+        for call in response.function_calls:
+            print(f'Calling function: {call.name}({call.args})')
+    else:
+        print(f'Response: {response.text}')
 
 if __name__ == "__main__":
     main()
