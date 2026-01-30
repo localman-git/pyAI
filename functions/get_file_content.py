@@ -3,7 +3,7 @@ from config import MAX_FILE_READ
 from google.genai import types
 
 schema_get_file_content = types.FunctionDeclaration(
-    name="get_file_contents",
+    name="get_file_content",
     description="Provides the contents of the specified file, up to 10,000 characters",
     parameters=types.Schema(
         type=types.Type.OBJECT,

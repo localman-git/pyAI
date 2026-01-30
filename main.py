@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompts import system_prompt
-from functions.call_function import available_functions
+from functions.call_function import available_functions, call_function
 
 def main():
     
@@ -42,8 +42,16 @@ def main():
         print(f'Response tokens: {response.usage_metadata.candidates_token_count}')
 
     if response.function_calls != None:
+        function_results = []
         for call in response.function_calls:
-            print(f'Calling function: {call.name}({call.args})')
+            function_call_result = call_function(call, verbose=args.verbose)
+            if function_call_result.parts is None:
+                raise RuntimeError('no parts list returned from function call')
+            if function_call_result.parts[0].function_response.response is None:
+                raise RuntimeError('no response returned from function call')
+            function_results.append(function_call_result.parts[0])
+            if args.verbose:
+                print(f'-> {function_call_result.parts[0].function_response.response}')
     else:
         print(f'Response: {response.text}')
 
